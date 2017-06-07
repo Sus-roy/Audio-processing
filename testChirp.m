@@ -4,10 +4,10 @@ function testChirp()
 %
 
 % The number of codes to try
-NoRepetitions = 10;
+NoRepetitions = 1;
 
 % The code length to use
-CodeLength = 64;
+CodeLength = 8;
 
 errors = zeros(NoRepetitions,1);
 
@@ -15,7 +15,7 @@ for i = 1:NoRepetitions
     
     code = generateRandomCode(CodeLength);    
         
-    %recording = encodeAndPlay(code);    
+    recording = encode(code);    
     %recordedCode = decode(recording);
     recordedCode = generateRandomCode(CodeLength);
     
