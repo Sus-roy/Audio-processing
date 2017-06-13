@@ -1,20 +1,19 @@
-function [ y2 ] = downChirp( f_low,f_high,sample_rate )
-%UNTITLED9 Summary of this function goes here
-%   Detailed explanation goes here
-%clear variables
+function [ y1 ] = up( f_low,f_high,sample_rate,time )
 if nargin == 0
-    f_low = 800;
+    f_low = 200;
     f_high = 0;
     sample_rate =44100;
+    time=10;
 end
+fs = sample_rate;
 f1 = f_low;
 fh = f_high;
-fs = sample_rate;
-n = 0:1/fs:1;
-phi = 2*pi*(f1*n + (fh-f1)*n.*n/2);
-y2 = 0.5*sin(phi);
-
-y2
-sound(y2,fs);
+t=time;
+t1=linspace(0,t,t*fs);
+y1= chirp(t1,f1,t,fh);
 end
+
+
+
+
 
