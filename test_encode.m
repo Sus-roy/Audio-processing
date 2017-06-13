@@ -7,7 +7,7 @@ code = randi([0,1],codeLength,1);
 recording = [];
 idleTime = 0.04 %40ms;
 preAmble = upChirp(0,200,0.1*44100) + idleTime;
-recording = [preAmble,recording];
+recording = [recording,preAmble];
 
 for j=1:length(code)
     
@@ -16,7 +16,7 @@ for j=1:length(code)
     elseif code(j) == 0
         y = downChirp() + idleTime;
     end
-    recording = [y,recording];    
+    recording = [recording,y];    
 end
 
 %plotting the original recording and revrese recording
