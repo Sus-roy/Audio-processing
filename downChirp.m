@@ -12,8 +12,3 @@ t=time;
 t1=linspace(0,t,t*fs);
 y1= chirp(t1,f1,t,fh);
 end
-
-
-
-
-
