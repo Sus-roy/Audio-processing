@@ -19,7 +19,7 @@ for j=1:length(code)
     recording = [y,recording];    
 end
 
-%sound(recording);
+%plotting the original recording and revrese recording
 size(recording)  
 reverse_recording= fliplr(recording);
 figure
@@ -31,5 +31,7 @@ subplot(2,1,2)
 plot (reverse_recording)
  
 title('reverse recording')
+%sound(recording)
+%sound(reverse_recording)
 
 end
