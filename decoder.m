@@ -5,34 +5,51 @@ clear all
 recording;
 figure
 plot(recording);
+
+% Sampling rate and length of the transmitted code
 Fs=fs
 bit_length=8;
 
+% Get length of the recording
 Lx = length(recording);
+
+% Generate up chirp signal for comparison
 up = upChirp(0,800,Fs,0.02)';
+
+% Generate down chirp signal for comparison
 down = downChirp(800,0,Fs,0.02)';
+
+% Get the length of the two signals
 Lup = length(up);
 Ldown= length(down);
+
+if Lup ~= Ldown
+    fprintf('Error, length of up and down signals does not match.\n');
+    return
+end
+
+% Determine the appropriate length for FFT and the extent of zero padding
 Nfft = Lx + Lup - 1;
 Nfft = 2^nextpow2(Nfft);
 
+% Perform FFT on the original recording
 f1=fft(recording,Nfft);
 f1=f1(1:Nfft/2);
 
+% Perform FFT on the up and down chirps
 f2=fft(up,Nfft);
 f2=f2(1:Nfft/2);
-
-length(f1);
-length(f2);
-convolution1 = f1 .* f2;
-
-convolution1=abs(ifft(convolution1));
-Nfft = Lx + Ldown - 1;
-Nfft = 2^nextpow2(Nfft);
 
 f3=fft(down,Nfft);
 f3=f3(1:Nfft/2);
 
+% Derive envelopes for up and down chirp
+
+%Up Chirp
+convolution1 = f1 .* f2;
+convolution1=abs(ifft(convolution1));
+
+% Down Chirp
 convolution2 = f1 .* f3;
 convolution2=abs(ifft(convolution2));
 
