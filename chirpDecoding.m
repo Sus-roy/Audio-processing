@@ -2,6 +2,7 @@ clear all
 clc
 % [recording,code_length]=test_encode();
 % Fs=44100;
+%fileID= fopen('q.txt','r');
 fileID= fopen('set1.txt','r');
 formatSpec = '%c';
 s = fscanf(fileID,formatSpec);
@@ -9,6 +10,7 @@ code=text2bin(s);
 fclose(fileID);
 code_length=length(code);
 
+%[recording,fs] = audioread('q.wav');
 [recording,fs] = audioread('s6n1_set1_phab1_chirp_200cm.wav');
 Fs=fs;
 
