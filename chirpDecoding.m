@@ -78,21 +78,6 @@ for i=1:2:length(indexes_of_segments_down)-1
 end
 data2
 
-
-% cd1=convolution1(indexes_of_segments_up(3):indexes_of_segments_up(4));
-% id1=findchangepts(cd1,'MaxNumChanges',4);
-% m=max(cd1(id1(1):id1(2)));
-% n=max(cd1(id1(3):id1(4)));
-% (m+n)/2
-% 
-% cd=convolution2(indexes_of_segments_down(3):indexes_of_segments_down(4));
-% id=findchangepts(cd,'MaxNumChanges',4);
-% m=max(cd(id(1):id(2)));
-% n=max(cd(id(3):id(4)));
-% (m+n)/2
-
-
-
 %Find maximum values between convolutions with up and down
 data_received = [];
 for i=1:code_length
