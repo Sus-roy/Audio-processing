@@ -16,7 +16,7 @@ for i = 1:NoRepetitions
     code = generateRandomCode(CodeLength);    
         
     recording = encode(code);    
-    %recordedCode = decode(recording);
+    recordedCode = decode(recording,44100);
     recordedCode = generateRandomCode(CodeLength);
     
     % Determine the number of bit errors
@@ -25,7 +25,7 @@ for i = 1:NoRepetitions
     
 end
 
-cdfplot(errors)
+%cdfplot(errors)
 
 fprintf('Correct codes: %f\n',nnz(errors == 0) / NoRepetitions);
 

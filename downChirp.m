@@ -1,7 +1,7 @@
 function [  x ] = downChirp( f_low,f_high,sample_rate,time )
 if nargin == 0
-    f_low = 200;
-    f_high = 0;
+    f_low = 19500;
+    f_high = 19000;
     sample_rate =44100;
     time=1;
 end

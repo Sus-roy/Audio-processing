@@ -1,4 +1,4 @@
-function decode(audioContents,Fs)
+function code = decode(audioContents,Fs)
 
 % Use a windowsize of 125ms
 windowSize = 100;
@@ -15,6 +15,9 @@ overLapInSamples = samplesPerWindow * overLap / 100;
 [s,w,t] = spectrogram(audioContents,kaiser(samplesPerWindow),overLapInSamples,2^nextpow2(samplesPerWindow),Fs,'yaxis');
 clf
 hold on;
+
+max(t)
+return
 
 % Plot the spectrogram
 spectrogram(audioContents,kaiser(samplesPerWindow),overLapInSamples,2^nextpow2(samplesPerWindow),Fs,'yaxis');
@@ -81,11 +84,10 @@ for j=2:windows
     end
     
     f = find(frequencies == 2);
-    length(f)
+%    length(f)
     for q = 1:length(f)
         plot([t(j-1),t(j)],[w(f(q))/1000,w(f(q))/1000],'r-');
     end
         
     
 end
-
