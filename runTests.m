@@ -1,131 +1,171 @@
 function runTests()
 
 files = {'new_q.wav'};
-codes = {'01110001'};
+code = [0,1,1,1,0,0,0,1];
 
 results = {};
 
 for i=1:length(files)
     
     [X,fs] = readFile(files{i});
-    testcode = decodeContents(X,fs);    
+    
+    % Uncomment following block to search for offset
+%     for q=1:882        
+%         testcode = decodeContents(X,fs,0,q);
+%         if sum(abs(testcode - code)) == 0
+%             fprintf('Offset %d, error %d\n', q, sum(abs(testcode - code)));
+%         end
+%     end    
+
+    % Test for a given file
+    % Parameters: 
+    % X: recording
+    % fs: sampling rate
+    % 0/1: whether to plot results or not, 1 = yes, 0 = no
+    % offset: start of signal to ignore
+    testcode = decodeContents(X,fs,1,38);
+    
+    %testcode = decodeContents(X,fs,1,38);
+    
     
 end
 
-function testcode = decodeContents(data, fs)
+function testcode = decodeContents(data, fs, plotOn, offset)
+
+if nargin < 4
+    offset = 1;
+end
+
+if nargin < 3
+    plotOn = 0;
+end
+
+codeLength = 8;
 
 % Determine 
 winSize = fs * 0.02;
 nfft = 2^nextpow2(winSize);
 fftBins = fs/2 * linspace(0,1,nfft/2);
 
-% Extract frames for passing through the data
+%
+upReference = upChirp(20000,20500,fs,0.023);
+downReference = downChirp(19500,19000,fs,0.023);
+
+upReference = Utils.addPadding(upReference,nfft);
+downReference = Utils.addPadding(downReference,nfft);
+
+% Compute windowing function
 windowFunction = hamming(nfft);
 
-for i = 1:nfft/2:length(data)
+testcode = [];
+
+if plotOn > 0
+    clf
+    figure(1);
+    subplot(4,1,1);
+    hold on;
+    subplot(4,1,2);
+    hold on;
+    subplot(4,1,3);
+    plot(q:length(data),data(q:end),'k--');
+    hold on
+    subplot(4,1,4);
+    hold on
+end
+
+for i = offset:winSize:length(data)
+    
+    if (i+winSize) > length(data)
+        continue
+    end
     
     % Extract next window
-    tmp = data(i:i+nfft-1);
+    tmp = data(i:i+winSize-1);
+       
     
-    % ap
+    % Add padding to the signal and perform bandpass filtering
+    tmp = Utils.addPadding(tmp',nfft);
+    tmp = tmp .* windowFunction';
+    tmp = Utils.bandPassFilter(tmp, fs, 18000,21500);
     
-    % Get energy of each bin
+    % Get total energy of bandpass filtered signal
+    energy = Utils.getEnergy(tmp);
     
+    % Extract envelopes
+    eUp = Utils.getEnvelope(tmp,upReference);
+    eDown = Utils.getEnvelope(tmp,downReference);
+    
+    %mup = eUp(1);
+    %mdown = eDown(1);       
+    mup = max(eUp);
+    mdown = max(eDown);
+    
+    bit = mup > mdown;
+    
+    if energy > 0.02
+       testcode = [testcode; energy, bit];
+    end
+    
+    if plotOn > 0
+    
+        subplot(4,1,1);plot([i:i+nfft-1],eUp,'r-');
+        subplot(4,1,2);plot([i:i+nfft-1],eDown,'r-');
+    
+        subplot(4,1,4);plot([i,i+nfft-1],[0, energy],'k--');        
+    end
     
 end
 
+[~,startIdx] = max(testcode(:,1));
 
-% % FFT resolution
-% nfft1 = 2^nextpow2(fs * 0.01);
-% nfft2 = 2^nextpow2(fs * 0.02);
-% 
-% h1 = hamming(nfft1);
-% h2 = hamming(nfft2);
-% 
-% fftBins1 = fs/2 * linspace(0,1,nfft1/2);
-% fftBins2 = fs/2 * linspace(0,1,nfft2/2);
-% 
-% energies = zeros(length(fftBins1),1);
-% ss = zeros(length(fftBins1),1);
-% N = zeros(length(fftBins1),1);
-% 
-% firstwin = 1;
-% 
-% testcode = [];
-% 
-% for i=1:nfft1:length(data)
-%     
-%     tmp = data(i:i+nfft1-1);
-%                 
-%     f = fft(tmp);
-%     f = 2 * abs(f(1:nfft1/2));    
-%     
-%     lf = logical(fftBins1 >= 19000 & fftBins1 <= 20500);
-%     f(~lf) = 0;
-%     
-%     if sum(f) == 0
-%         continue
-%     end
-%     
-%     if firstwin == 1
-%         energies = f;
-%         ss = (f - energies).^2;
-%         N = ones(length(f),1) + 1;
-%         firstwin = 0;
-%         continue;                
-%     end    
-%     
-%     lenerg =  logical(ss > 0);
-%     
-%     stmp = max(sqrt(ss(lenerg)./ N(lenerg)),0.001);
-%     zval = (f(lenerg) - energies(lenerg)) ./ (stmp);
-%     
-%     l = logical(abs(zval) > tinv(1 - 0.001/2, N(lenerg))) & logical(f(lenerg) > 0);    
-%     
-%     if nnz(l) > 0        
-%         testcode = [testcode; ones(nnz(l),1)*i, fftBins1(find(l))'];
-%     end
-%         
-%     energies = energies + (1 ./ (N + 1)) .* (f - energies);
-%     t = N;
-%     ss = ss + (t - 1) ./ t .* (f - energies).^2;
-%     N = N + 1;
-%     
-%     
-% end
-% 
-% %[ss,energies,N]
-% 
-% size(testcode)
-% 
-% 
-% clf;
-% figure(1)
-% hold on;
-% plot(1:length(data),data,'k--')
-% 
-% figure(2);
-% hold on
-% 
-% for q=1:length(testcode)
-%     
-%     val = testcode(q,:);
-%     f = val(:,2);
-%     val = val(:,1);
-%     
-%     if f < 18000
-%         continue
-%     end
-%     
-%     f
-%             
-%     plot([val,val+nfft1],[f,f],'r-x');
-%     
-% end
+curLength = 1;
+
+l = zeros(length(testcode),1);
+l(startIdx) = 1;
+
+buffer = [];
+
+if startIdx > 1
+    buffer = [buffer, startIdx-1];
+end
+
+if startIdx < length(testcode)-1
+    buffer = [buffer, startIdx + 1];
+end
+
+while curLength < codeLength
+    
+   if isempty(buffer)
+       break
+   end
+   
+   [~,idx] = max(testcode(buffer,1));      
+   nextIdx = buffer(idx);
+   ltmp = zeros(length(buffer),1);
+   ltmp(idx) = 1;
+   buffer = buffer(~ltmp);
+   l(nextIdx) = 1;
+   
+   curLength = curLength + 1;
+   
+   if nextIdx > 1 & l(nextIdx - 1) == 0
+        buffer = [buffer, nextIdx-1];
+   end
+
+    if nextIdx < length(testcode)-1 & l(nextIdx + 1) == 0
+        buffer = [buffer, nextIdx + 1];
+    end
+   %break
+    
+end
+
+testcode = testcode(find(l>0),2)';
 
 
 function [data, fs] = readFile(fileName)
 % Read a given audio file
 
 [data,fs] = audioread(fileName);
+
+
 

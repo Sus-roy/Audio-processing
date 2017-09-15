@@ -5,8 +5,8 @@ fs = 44100;
 t = fs * 0.02;
 nfft = 2^nextpow2(t);
 
-X = upChirp(19000,19500,fs,0.02);
-Y = downChirp(19000,18500,fs,0.02);
+    X = upChirp(19000,19500,fs,0.02);
+    Y = downChirp(19000,18500,fs,0.02);
 
 subplot(4,1,1);
 spectrogram(X,'yaxis');

@@ -17,10 +17,10 @@ classdef Utils
             end
             
         end
-        
-        % Method for extracting envelope of a signal with respect to a
         % reference signal
         function envelope = getEnvelope(signal, referenceSignal)
+        
+        % Method for extracting envelope of a signal with respect to a
             
             % Determine length of fft to use
             M = max([length(signal),length(referenceSignal)]);
@@ -46,11 +46,11 @@ classdef Utils
 
         % Perform bandpass filtering on the signal
         function filteredSignal = bandPassFilter(signal, samplingRate, lowerPassFrequency, upperPassFrequency)
-
-            % Get length of signal
-            M = length(signal);
             
-            % Determine length of fft
+            % Get the current length of the signal
+            M = length(signal);
+           
+            % Determine fft length
             nfft = 2^nextpow2(M);
             
             % Determine range of frequencies for fft
@@ -64,6 +64,7 @@ classdef Utils
             signal = signal - mean(signal);
             spectrum = fftshift(fft(signal,nfft)) / nfft;
             
+            
             % Apply bandpass filter on data
             spectrum = BPF' .* spectrum;
             
@@ -72,6 +73,25 @@ classdef Utils
             
 
         end
+        
+        % Get the energy of a signal
+        function energy = getEnergy(signal)
+            
+            % Get the current length of the signal
+            M = length(signal);
+           
+            % Determine fft length
+            nfft = 2^nextpow2(M);
+            
+            % Perform fft
+            f = fft(signal);
+            
+            % Return results
+            energy = sum(f .* conj(f));
+            
+            
+        end
+                
         
     end
     
