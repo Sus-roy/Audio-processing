@@ -13,7 +13,7 @@ for i=1:length(files)
     X = X .* m^-1;
     
     % Uncomment following block to search for offset
-    for q=1:1024       
+    for q=1:882      
          testcode = decodeContents(X,fs,0,q);
          if sum(abs(testcode - code)) == 0
              fprintf('Offset %d, error %d\n', q, sum(abs(testcode - code)));
@@ -49,7 +49,7 @@ end
 codeLength = 8;
 
 % Determine 
-winSize = 1024;%fs * 0.02;
+winSize = fs * 0.02;
 nfft = 2^nextpow2(winSize);
 fftBins = fs/2 * linspace(0,1,nfft/2);
 

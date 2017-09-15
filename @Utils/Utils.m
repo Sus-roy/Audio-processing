@@ -84,7 +84,7 @@ classdef Utils
             nfft = 2^nextpow2(M);
             
             % Perform fft
-            f = fft(signal);
+            f = fft(signal,nfft);
             
             % Return results
             energy = sum(f .* conj(f));
